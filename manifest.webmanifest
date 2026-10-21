@@ -1,0 +1,29 @@
+{
+ "name": "서울 아파트 시세 지도",
+ "short_name": "서울아파트지도",
+ "description": "서울 아파트 실거래·용적률·역 거리 지도와 대출 계산기(참고용)",
+ "lang": "ko",
+ "start_url": "./",
+ "scope": "./",
+ "display": "standalone",
+ "background_color": "#f3f5f6",
+ "theme_color": "#1f5f8b",
+ "icons": [
+  {
+   "src": "icons/icon-192.png",
+   "sizes": "192x192",
+   "type": "image/png"
+  },
+  {
+   "src": "icons/icon-512.png",
+   "sizes": "512x512",
+   "type": "image/png"
+  },
+  {
+   "src": "icons/icon-maskable-512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "maskable"
+  }
+ ]
+}

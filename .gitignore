@@ -1,0 +1,15 @@
+# API keys and raw collection outputs must never be committed
+key.txt
+vworld_key.txt
+*.key
+.env
+seoul_rt/
+data/raw/
+osm/
+land/
+*.part
+resp.tmp
+log.txt
+# OS / editor
+.DS_Store
+Thumbs.db
