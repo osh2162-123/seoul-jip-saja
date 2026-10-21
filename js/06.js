@@ -24,7 +24,7 @@
     row('경과연수', 'age', r.age == null ? '—' : r.age + '년');
     row('세대수 (대장)', 'units', r.units == null ? '—' : F.fmtInt(r.units) + (r.shared > 1 ? ` (단지 ${r.shared}개 합계)` : ''));
     row('용도지역', 'zone', r.zone || '—');
-    row('용적률', 'far', r.far != null ? r.far + '%' + (r.far_src && r.far_src !== '대장 기재' ? ` (${r.far_src})` : '') : (r.far_note || '—'));
+    row('용적률', 'far', r.far != null ? r.far + '%' + (r.far_src && r.far_src !== '대장 기재' ? ` (${r.far_note || r.far_src})` : '') : (r.far_note || '—'));
     if (r.site_m2 != null) row('대지면적', 'site_m2', `${F.fmtInt(Math.round(r.site_m2))}㎡ (${F.fmtInt(Math.round(r.site_m2 / 3.3058))}평)` + (r.site_src ? ` · ${r.site_src}` : ''));
     row('세대당 대지 (평균)', 'site_py_per_unit', r.site_py_per_unit == null ? '—' : r.site_py_per_unit + '평');
     row('최근 12개월 거래', 'trades_12m', F.fmtInt(r.trades_12m) + '건');
