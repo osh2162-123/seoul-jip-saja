@@ -39,16 +39,16 @@
     const X = (r) => px(r.lon), Y = (r) => py(r.lat);
     const line = (pa) => 'M' + pa.map((c) => px(c[0]).toFixed(1) + ',' + py(c[1]).toFixed(1)).join('L');
     const R = d3.scaleSqrt([0, 5000], [1.6, 9]).clamp(true);
-    const T = window.sxTheme(), muted = T.dot, bg = T.surface, fg = T.text, water = T.water;
+    const T = window.sxTheme(), M = T.map, muted = M.muted, bg = T.surface, fg = T.text, water = d3.interpolateRgb(bg, M.water)(0.22);
     let color, lo, hi, diverging = false;
     const vals = pts.map((r) => r[key]).filter((v) => v != null).sort(d3.ascending);
     if (key === 'chg_1y' || key === 'vs_2122') {
       diverging = true; const m = key === 'chg_1y' ? 0.3 : 0.4; lo = -m; hi = m;
-      const pos = d3.interpolateRgb(d3.interpolateRgb(bg, T.up)(0.15), T.up), neg = d3.interpolateRgb(d3.interpolateRgb(bg, T.down)(0.15), T.down);
+      const pos = d3.interpolateRgb(d3.interpolateRgb(bg, M.accent)(0.15), M.accent), neg = d3.interpolateRgb(d3.interpolateRgb(bg, M.bad)(0.15), M.bad);
       color = (v) => (v >= 0 ? pos(Math.min(1, v / m)) : neg(Math.min(1, -v / m)));
     } else {
       lo = key === 'age' ? 0 : d3.quantileSorted(vals, 0.05); hi = key === 'age' ? 45 : d3.quantileSorted(vals, 0.95);
-      const ramp = window.sxRamp(T.ramp);
+      const ramp = d3.interpolateRgb(d3.interpolateRgb(bg, M.accent)(0.12), M.accent);
       color = (v) => ramp(Math.max(0, Math.min(1, (v - lo) / (hi - lo))));
     }
     box.replaceChildren(); box.style.minHeight = H + 'px';
@@ -59,9 +59,9 @@
     gb.selectAll('path.w').data(base.filter((b) => b.kind === 'water')).join('path').attr('class', 'w')
       .attr('d', (b) => b.paths.map(line).join('') + 'Z').attr('fill', water).attr('fill-rule', 'evenodd').attr('stroke', 'none');
     gb.selectAll('path.gu').data(gu).join('path').attr('class', 'gu')
-      .attr('d', (b) => b.paths.map((pa) => line(pa) + 'Z').join('')).attr('fill', 'none').attr('stroke', T.edge).attr('stroke-width', 0.7).attr('vector-effect', 'non-scaling-stroke');
+      .attr('d', (b) => b.paths.map((pa) => line(pa) + 'Z').join('')).attr('fill', 'none').attr('stroke', M.axis).attr('stroke-width', 0.7).attr('vector-effect', 'non-scaling-stroke');
     gb.selectAll('path.l').data(base.filter((b) => b.kind === 'line')).join('path').attr('class', 'l')
-      .attr('d', (b) => b.paths.map(line).join('')).attr('fill', 'none').attr('stroke', T.rail).attr('stroke-opacity', 0.7)
+      .attr('d', (b) => b.paths.map(line).join('')).attr('fill', 'none').attr('stroke', (b) => b.color || M.sub).attr('stroke-opacity', 0.45)
       .attr('stroke-width', 1.2).attr('stroke-linecap', 'round').attr('vector-effect', 'non-scaling-stroke');
     // complexes
     const on = pts.filter(window.sxFilter), off = pts.filter((r) => !window.sxFilter(r));

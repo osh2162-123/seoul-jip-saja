@@ -5,6 +5,7 @@
   window.sxTheme = () => ({
     text: tok('text'), textSub: tok('text-sub'), surface: tok('surface'), accent: tok('accent'), up: tok('up'), down: tok('down'),
     water: tok('water'), edge: tok('edge'), rail: tok('rail'), dot: tok('dot'), grid: tok('grid'), axis: tok('axis'), ref: tok('ref'),
+    map: { accent: tok('map-accent'), bad: tok('map-bad'), muted: tok('map-muted'), axis: tok('map-axis'), sub: tok('map-sub'), water: tok('map-water') },
     ramp: [1, 2, 3, 4, 5].map((i) => tok('ramp-' + i)), series: [1, 2, 3].map((i) => tok('series-' + i)),
   });
   // 여러 단계 색을 이어 만든 연속 색띠. 입력은 0~1

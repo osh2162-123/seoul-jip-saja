@@ -107,6 +107,17 @@ body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--
 .sx b { font-weight: var(--fw-semi); }
 .sx a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
 .sx button, .sx select, .sx input { font: inherit; color: inherit; }
+/* 단지 지도 전용 색. 지도는 점 색만으로 값을 읽기 때문에 원래의 파랑/주황 대비를 유지한다. 나머지 화면은 00-tokens.css 의 3색 계열. */
+:root, .sx {
+  --map-accent: #1f5f8b; --map-bad: #b4412f; --map-muted: #b9c2c8; --map-axis: #aab4bb; --map-sub: #5b6670;
+  --map-water: #3d8fd1; --map-water-mix: 0.22; --map-rail-opacity: 0.45;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --map-accent: #5fa8d8; --map-bad: #ec7a65; --map-muted: #3c4851; --map-axis: #46525b; --map-sub: #9aa7b0;
+} }
+:root[data-theme="dark"] {
+  --map-accent: #5fa8d8; --map-bad: #ec7a65; --map-muted: #3c4851; --map-axis: #46525b; --map-sub: #9aa7b0;
+}
 /* 02-layout.css — 한 칼럼 배치 */
 .sx { display: grid; gap: var(--sp-5); padding: var(--sp-4); min-width: 0; }
 .sx .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); gap: var(--sp-4); align-items: start; }
