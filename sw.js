@@ -1,8 +1,8 @@
 // Service worker: network-first for app files so data/rule updates arrive when online,
 // cache-first for fonts (immutable subsets). Bump VERSION on every release.
-const VERSION = 'app-2026-10-25-2';
+const VERSION = 'app-2026-10-26-3';
 const FONTS = 'fonts-v1';
-const CORE = ["./", "./index.html", "./licenses.html", "./manifest.webmanifest", "./fonts/Pretendard-subset.woff2", "./vendor/d3.min.js", "./icons/icon-192.png", "./icons/icon-512.png", "./js/01.js", "./js/02.js", "./js/03.js", "./js/04.js", "./js/05.js", "./js/06.js", "./js/07.js", "./js/08.js", "./js/09.js", "./js/10.js", "./js/11.js", "./js/12.js", "./js/13.js", "./js/14.js", "./js/15.js", "./js/99-sw.js"];
+const CORE = ["./", "./index.html", "./licenses.html", "./manifest.webmanifest", "./fonts/Pretendard-subset.woff2", "./vendor/d3.min.js", "./icons/icon-192.png", "./icons/icon-512.png", "./js/01.js", "./js/02.js", "./js/03.js", "./js/04.js", "./js/05.js", "./js/06.js", "./js/07.js", "./js/08.js", "./js/09.js", "./js/10.js", "./js/11.js", "./js/12.js", "./js/13.js", "./js/14.js", "./js/15.js", "./js/16.js", "./js/17.js", "./js/18.js", "./js/99-sw.js"];
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(VERSION).then((c) => c.addAll(CORE)).then(() => self.skipWaiting()));
 });

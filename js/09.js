@@ -1,45 +1,52 @@
-// ---------- district bars
+// ---------- detail
 (function () {
-  const box = document.getElementById('gu-bars');
-  const tip = document.createElement('div'); tip.className = 'tip'; tip.hidden = true;
+  const box = document.getElementById('detail');
+  const wrap = document.getElementById('types-wrap');
+  const tbody = document.querySelector('#types-table tbody');
   dash.onData(() => {
     const F = window.sxF;
-    const g = dash.data('gu_stats');
-    box.replaceChildren();
-    if (g.status !== 'ok') { if (g.status === 'error') { const f = document.createElement('div'); f.className = 'fail'; f.textContent = 'Failed to load'; box.appendChild(f); } return; }
     const p = dash.params();
-    const rows = g.data.filter((r) => r.med_chg != null).slice().sort((a, b) => b.med_chg - a.med_chg);
-    const W = box.clientWidth || 600, rh = 21, top = 4;
-    const H = top + rows.length * rh + 4;
-    box.style.minHeight = H + 'px';
-    const svg = d3.select(box).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).attr('height', H);
-    const probe = svg.append('text').attr('font-size', 12).text('동대문구');
-    const lw = probe.node().getComputedTextLength() + 10; probe.remove();
-    const vw = 56;
-    const mn = Math.min(0, d3.min(rows, (r) => r.med_chg)), mx = d3.max(rows, (r) => r.med_chg);
-    const x = d3.scaleLinear([mn, mx], [lw, W - vw]);
-    const y = (i) => top + i * rh;
-    const T = window.sxTheme(), c0 = T.accent, muted = T.dot;
-    svg.append('line').attr('x1', x(0)).attr('x2', x(0)).attr('y1', 0).attr('y2', H).attr('stroke', T.axis);
-    const gr = svg.selectAll('g.r').data(rows).join('g').attr('class', 'r').style('cursor', 'pointer')
-      .on('click', (e, r) => dash.setParams({ gu: p.gu === r.gu ? null : r.gu }))
-      .on('mousemove', (e, r) => {
-        tip.hidden = false; tip.replaceChildren();
-        const a = document.createElement('div'); a.className = 't1'; a.textContent = r.gu;
-        const b = document.createElement('div'); b.textContent = `1년 ${F.fmtPct(r.med_chg)} · 평당 ${F.fmtPpy(r.med_ppy)}`;
-        const c = document.createElement('div'); c.textContent = `거래 활발 ${r.n_active}개 · 30년+ ${r.n_old}개 (6억 미만 ${r.n_old_cheap} · 5억 미만 ${r.n_old_5})`;
-        tip.append(a, b, c);
-        const [mx2, my2] = d3.pointer(e, box);
-        tip.style.left = Math.max(0, Math.min(box.clientWidth - tip.offsetWidth, mx2 + 12)) + 'px';
-        tip.style.top = Math.max(0, my2 - tip.offsetHeight - 8) + 'px';
-      }).on('mouseleave', () => { tip.hidden = true; });
-    const hot = (r) => r.gu === p.gu;
-    gr.append('rect').attr('x', (r) => Math.min(x(0), x(r.med_chg))).attr('y', (r, i) => y(i) + 3).attr('height', rh - 6)
-      .attr('width', (r) => Math.max(1, Math.abs(x(r.med_chg) - x(0)))).attr('rx', 4).attr('fill', (r) => (hot(r) ? c0 : muted));
-    gr.append('text').attr('x', lw - 8).attr('y', (r, i) => y(i) + rh / 2).attr('dy', '0.35em').attr('text-anchor', 'end').attr('font-size', 12)
-      .attr('fill', (r) => (hot(r) ? T.text : T.textSub)).attr('font-weight', (r) => (hot(r) ? 600 : 400)).text((r) => r.gu);
-    gr.append('text').attr('x', (r) => Math.max(x(0), x(r.med_chg)) + 6).attr('y', (r, i) => y(i) + rh / 2).attr('dy', '0.35em').attr('font-size', 12)
-      .attr('fill', T.textSub).style('font-variant-numeric', 'tabular-nums').text((r) => F.fmtPct(r.med_chg));
-    box.appendChild(tip);
+    const d = dash.data('complexes');
+    if (d.status !== 'ok') { box.replaceChildren(); wrap.hidden = true; if (d.status === 'error') { const f = document.createElement('div'); f.className = 'fail'; f.textContent = 'Failed to load'; box.appendChild(f); } return; }
+    const r = d.data.find((x) => x.id === p.sel);
+    if (!r) { box.innerHTML = '<p class="note">지도나 표에서 단지를 누르세요.</p>'; wrap.hidden = true; return; }
+    const where = 'id=' + encodeURIComponent(r.id);
+    const cell = (field, text) => { const s = document.createElement('span'); s.dataset.source = 'complexes'; s.dataset.field = field; s.dataset.where = where; s.textContent = text; return s; };
+    box.replaceChildren();
+    const nm = document.createElement('p'); nm.className = 'dname'; nm.appendChild(cell('name', r.name)); box.appendChild(nm);
+    const sub = document.createElement('p'); sub.className = 'note'; sub.append(cell('gu', r.gu), ' ', cell('dong', r.dong), ' ', cell('jibun', r.jibun)); box.appendChild(sub);
+    const dl = document.createElement('dl'); dl.className = 'dl';
+    const row = (label, field, text, cls) => { const dt = document.createElement('dt'); dt.textContent = label; const dd = document.createElement('dd'); const c = cell(field, text); if (cls) c.className = cls; dd.appendChild(c); dl.append(dt, dd); };
+    const pn = (v) => (v == null ? '' : v >= 0 ? 'pos' : 'neg');
+    row('가까운 역', 'st_name', r.st_name == null ? '—' : r.st_name);
+    if (r.st_m != null) row('역까지 직선거리', 'st_m', F.fmtInt(r.st_m) + 'm');
+    row('준공', 'year', r.year == null ? '—' : r.year + '년');
+    row('경과연수', 'age', r.age == null ? '—' : r.age + '년');
+    row('세대수 (대장)', 'units', r.units == null ? '—' : F.fmtInt(r.units) + (r.shared > 1 ? ` (단지 ${r.shared}개 합계)` : ''));
+    row('용도지역', 'zone', r.zone || '—');
+    row('용적률', 'far', r.far != null ? r.far + '%' + (r.far_src && r.far_src !== '대장 기재' ? ` (${r.far_note || r.far_src})` : '') : (r.far_note || '—'));
+    if (r.site_m2 != null) row('대지면적', 'site_m2', `${F.fmtInt(Math.round(r.site_m2))}㎡ (${F.fmtInt(Math.round(r.site_m2 / 3.3058))}평)` + (r.site_src ? ` · ${r.site_src}` : ''));
+    row('세대당 대지 (평균)', 'site_py_per_unit', r.site_py_per_unit == null ? '—' : r.site_py_per_unit + '평');
+    row('최근 12개월 거래', 'trades_12m', F.fmtInt(r.trades_12m) + '건');
+    row('평당가 (전용)', 'ppy_12m', F.fmtPpy(r.ppy_12m));
+    row('1년 변화율', 'chg_1y', F.fmtPct(r.chg_1y), pn(r.chg_1y));
+    row('21~22년 대비', 'vs_2122', F.fmtPct(r.vs_2122), pn(r.vs_2122));
+    const px = window.sxPx(r);
+    row(px.band ? '시세 (정한 면적 구간)' : '최소 평형 중위가', 'min_price', px.price == null ? '—' : `${F.fmtEok(px.price)} (전용 ${px.area}㎡)` + (px.n != null ? ` · 12개월 ${px.n}건` : '') + (px.thin ? ' · 표본 적음' : ''));
+    const tr0 = window.sxTrades(r); if (tr0.last) row('마지막 거래', 'last_date', tr0.last);
+    box.appendChild(dl);
+    if (r.suspect) { const w = document.createElement('p'); w.className = 'note'; w.textContent = '이 단지는 건축물대장 연결이 의심됩니다(거래 수가 대장 세대수에 비해 너무 많음). 세대수·용적률을 믿지 마세요.'; box.appendChild(w); }
+    if (r.register_match === '없음') { const w = document.createElement('p'); w.className = 'note'; w.textContent = '건축물대장과 연결되지 않아 세대수·용적률·위치가 없습니다.'; box.appendChild(w); }
+    const t = dash.data('types');
+    if (t.status !== 'ok') { wrap.hidden = true; return; }
+    const rows = t.data.filter((x) => x.id === r.id).sort((a, b) => a.area - b.area);
+    wrap.hidden = !rows.length;
+    tbody.replaceChildren(...rows.map((x) => {
+      const tr = document.createElement('tr'); tr.dataset.key = encodeURIComponent(x.id) + ',' + x.area;
+      [x.area, x.n_12m, F.fmtEok(x.med_12m), F.fmtEok(x.min_12m), F.fmtEok(x.max_12m), F.fmtEok(x.med_prev), F.fmtEok(x.med_2122), x.last_date, F.fmtEok(x.last_price)].forEach((v, i) => {
+        const td = document.createElement('td'); td.textContent = v == null ? '—' : v; if (i === 3 || i === 4) td.className = 'hide-narrow'; tr.appendChild(td);
+      });
+      return tr;
+    }));
   });
 })();
